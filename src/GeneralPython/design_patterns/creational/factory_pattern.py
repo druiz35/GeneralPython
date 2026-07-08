@@ -23,7 +23,7 @@ class Creator(ABC):
         pass
 
     def other_method(self) -> None:
-        product: Product = create_product()
+        product: Product = self.create_product()
         product.do_something()
 
 class ConcreteCreatorA(Creator):
@@ -38,23 +38,13 @@ class ConcreteCreatorB(Creator):
 
 ## Hypothetical implementation
 product_setting = "B"
-#if __name__ == "__main__":
-#    product: Product = None
-#    if os.environ["PRODUCT_SETTING"] == "A" or product_setting == "A":
-#        product = ConcreteCreatorA.create_product()
-#    elif os.environ["PRODUCT_SETTING"] == "B" or product_setting == "B":
-#        product = ConcreteCreatorB.create_product()
-#    product.do_something()
-
-## A more pythonic implementation
-## Instead of a set of class, use a factory standalone method
 def build_product(product_setting: str) -> Product:
     if product_setting == "A":
-        return ProductA()
+        return ConcreteCreatorA()
     elif product_setting == "B":
-        return ProductB()
+        return ConcreteCreatorB()
 
 if __name__ == "__main__":
-    product: Product = build_product(product_setting)
-    product.do_something()
+    product: Creator = build_product(product_setting)
+    product.other_method()
 
