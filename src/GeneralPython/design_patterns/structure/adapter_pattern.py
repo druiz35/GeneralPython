@@ -1,33 +1,35 @@
-class NewService:
-    def request(self) -> str:
-        return "Target: The default targets' behavior."
+from abc import ABC, abstractmethod
+import json
 
-class ExistingService:
-    def specific_request(self) -> str:
-        return ".eetpadA eht fo roivaheb laicepS"
+class NewServiceInterface(ABC):
+    @abstractmethod
+    def do_something(self) -> None:
+        pass
 
-class Adapter(NewService, ExistingService):
-    def request(self) -> str:
-        return f"Adapter: (TRANSLATED) {self.specific_request()[::-1]}"
+class OldService:
+    def do_something_old(self) -> None:
+        print("Legacy method")
 
-class NewNewService:
-    def other_specific_request(self) -> str:
-        return "Coso coso coso coso"
+class NewService(NewServiceInterface):
+    def do_something(self) -> None:
+        print("New method")
 
-class NewAdapter(NewNewService, ExistingService):
-    def request(self) -> str:
-        return f"New Adapter: {self.other_specific_request()}"
+class Adapter(NewServiceInterface):
+    def __init__(self, legacy_service: OldService):
+        self._legacy_service = legacy_service
+
+    def do_something(self):
+        self._legacy_service.do_something_old()
+
+class Client:
+    def do_something_with_service(self, service: NewServiceInterface):
+        service.do_something()
+
 
 if __name__ == "__main__":
-    target = NewService()
-    print(target.request())
-    print("\n")
-
-    adaptee = ExistingService()
-    print(f"Adaptee: {adaptee.specific_request()}", end="\n\n")
-
-    adapter = Adapter()
-    print(adapter.request(), end="\n\n")
-
-    new_adapter = NewAdapter()
-    print(new_adapter.request())
+    legacy_service = OldService()
+    new_service = NewService()
+    adapter = Adapter(legacy_service)
+    client = Client()
+    client.do_something_with_service(adapter)
+    client.do_something_with_service(new_service)
